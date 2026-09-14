@@ -9,7 +9,7 @@
   },
   "keywords": [],
   "author": "Emanoel <edioemanuel711@gmail.com>",
-  "license": "ISC",
+  "license": "MIT",
   "type": "commonjs",
   "dependencies": {
     "@whiskeysockets/baileys": "^7.0.0-rc14",
