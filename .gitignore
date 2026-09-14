@@ -1,0 +1,47 @@
+# Node
+node_modules/
+npm-debug.log*
+
+# Sessao/credenciais do WhatsApp (Baileys) - NUNCA versionar
+bot-figurinhas-bridge/sessao_auth/
+bot-figurinhas-bridge/sessao_auth_backup/
+
+# Imagens recebidas de usuarios via WhatsApp
+bot-figurinhas-bridge/imagens_recebidas/
+
+# Arquivos temporarios de conversao
+temp_conversao/
+
+# Java build output
+out/
+target/
+*.class
+
+### IntelliJ IDEA ###
+.idea/
+*.iml
+.kotlin
+
+### Eclipse ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+### VS Code ###
+.vscode/
+
+### OS ###
+.DS_Store
+Thumbs.db
