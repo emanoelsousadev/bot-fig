@@ -1,13 +1,14 @@
 {
   "name": "bot-figurinhas-bridge",
   "version": "1.0.0",
-  "description": "",
+  "description": "Bot de figurinhas para WhatsApp: recebe fotos e vídeos e responde com sticker convertido via ffmpeg",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
+  "author": "Emanoel <edioemanuel711@gmail.com>",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
