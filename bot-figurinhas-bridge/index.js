@@ -16,7 +16,6 @@ async function iniciarBot() {
         auth: state,
         logger: pino({ level: 'silent' })
     });
-
     sock.ev.on('creds.update', saveCreds);
 
     sock.ev.on('connection.update', (update) => {
