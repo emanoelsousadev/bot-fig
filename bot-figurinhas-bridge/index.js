@@ -4,25 +4,21 @@ const pino = require('pino');
 const fs = require('fs');
 const path = require('path');
 
-// Pasta onde vamos salvar as imagens recebidas, por enquanto só pra teste
 const PASTA_IMAGENS = path.join(__dirname, 'imagens_recebidas');
 if (!fs.existsSync(PASTA_IMAGENS)) {
     fs.mkdirSync(PASTA_IMAGENS);
 }
 
 async function iniciarBot() {
-    // Salva a sessão numa pasta local, assim não precisa escanear o QR toda vez
     const { state, saveCreds } = await useMultiFileAuthState('sessao_auth');
 
     const sock = makeWASocket({
         auth: state,
-        logger: pino({ level: 'silent' }) // muda pra 'info' se quiser ver logs detalhados
+        logger: pino({ level: 'silent' })
     });
 
-    // Sempre que a sessão for atualizada, salva localmente
     sock.ev.on('creds.update', saveCreds);
 
-    // Escuta mudanças de conexão (QR code, conectado, desconectado)
     sock.ev.on('connection.update', (update) => {
         const { connection, lastDisconnect, qr } = update;
 
@@ -42,11 +38,10 @@ async function iniciarBot() {
         }
     });
 
-    // Escuta mensagens recebidas
     sock.ev.on('messages.upsert', async (m) => {
         const msg = m.messages[0];
         if (!msg.message) return;
-        if (msg.key.fromMe) return; // ignora mensagens enviadas pelo próprio bot
+        if (msg.key.fromMe) return;
 
         const remetente = msg.key.remoteJid;
         const tipoMensagem = Object.keys(msg.message)[0];
@@ -76,7 +71,6 @@ async function iniciarBot() {
 
                 console.log(`✅ Arquivo salvo em: ${caminhoCompleto}`);
 
-                // Manda pro backend Java, informando o tipo via query param
                 console.log('🔄 Enviando para o backend Java converter em figurinha...');
                 const base64Original = buffer.toString('base64');
 

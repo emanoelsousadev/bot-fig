@@ -10,16 +10,14 @@ import java.util.UUID;
 
 public class ConversorFigurinhaServer {
 
-    // Pasta temporária onde vamos salvar as imagens durante o processamento
     static final String PASTA_TEMP = "temp_conversao";
 
     public static void main(String[] args) throws IOException {
-        // Garante que a pasta temporária existe
         Files.createDirectories(Paths.get(PASTA_TEMP));
 
         HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
         server.createContext("/converter", new ConversorHandler());
-        server.setExecutor(null); // usa executor padrão
+        server.setExecutor(null);
         server.start();
 
         System.out.println("✅ Servidor Java rodando em http://localhost:8080");
@@ -30,11 +28,10 @@ public class ConversorFigurinhaServer {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
             if (!"POST".equalsIgnoreCase(exchange.getRequestMethod())) {
-                exchange.sendResponseHeaders(405, -1); // Method Not Allowed
+                exchange.sendResponseHeaders(405, -1);
                 return;
             }
 
-            // Lê o parâmetro "tipo" da URL (imagem ou video). Padrão: imagem
             String query = exchange.getRequestURI().getQuery();
             String tipo = "imagem";
             if (query != null && query.contains("tipo=video")) {
@@ -48,14 +45,11 @@ public class ConversorFigurinhaServer {
             Path caminhoSaida = Paths.get(PASTA_TEMP, idUnico + "_saida.webp");
 
             try {
-                // 1. Lê o corpo da requisição (base64 da mídia)
                 String base64Recebido = new String(exchange.getRequestBody().readAllBytes());
                 byte[] bytesMidia = Base64.getDecoder().decode(base64Recebido);
 
-                // 2. Salva o arquivo original temporariamente
                 Files.write(caminhoEntrada, bytesMidia);
 
-                // 3. Chama o ffmpeg para converter em WebP (estático ou animado)
                 boolean sucesso = tipo.equals("video")
                         ? converterVideoParaWebpAnimado(caminhoEntrada, caminhoSaida)
                         : converterImagemParaWebp(caminhoEntrada, caminhoSaida);
@@ -65,7 +59,6 @@ public class ConversorFigurinhaServer {
                     return;
                 }
 
-                // 4. Lê o resultado e converte para base64
                 byte[] bytesWebp = Files.readAllBytes(caminhoSaida);
                 String base64Resultado = Base64.getEncoder().encodeToString(bytesWebp);
 
@@ -75,7 +68,6 @@ public class ConversorFigurinhaServer {
                 e.printStackTrace();
                 enviarResposta(exchange, 500, "Erro interno: " + e.getMessage());
             } finally {
-                // Limpa os arquivos temporários
                 try { Files.deleteIfExists(caminhoEntrada); } catch (IOException ignored) {}
                 try { Files.deleteIfExists(caminhoSaida); } catch (IOException ignored) {}
             }
@@ -85,7 +77,7 @@ public class ConversorFigurinhaServer {
             try {
                 ProcessBuilder pb = new ProcessBuilder(
                         "ffmpeg",
-                        "-y", // sobrescreve se existir
+                        "-y",
                         "-i", entrada.toAbsolutePath().toString(),
                         "-vf", "scale=512:512:force_original_aspect_ratio=decrease,format=rgba,pad=512:512:(ow-iw)/2:(oh-ih)/2:color=0x00000000",
                         "-pix_fmt", "yuva420p",
@@ -99,12 +91,10 @@ public class ConversorFigurinhaServer {
             }
         }
 
-        // Limites usados pelo WhatsApp para figurinhas animadas
         static final int DURACAO_MAXIMA_SEGUNDOS = 6;
-        static final long TAMANHO_MAXIMO_BYTES = 500 * 1024; // 500 KB
+        static final long TAMANHO_MAXIMO_BYTES = 500 * 1024;
 
         private boolean converterVideoParaWebpAnimado(Path entrada, Path saida) {
-            // Tenta com qualidade decrescente até caber no limite de tamanho
             int[] tentativasFps = { 12, 10, 8 };
             int[] tentativasQualidade = { 60, 45, 30 };
 
@@ -119,9 +109,8 @@ public class ConversorFigurinhaServer {
                             i + 1, tentativasFps[i], tentativasQualidade[i], tamanho / 1024.0);
 
                     if (tamanho <= TAMANHO_MAXIMO_BYTES) {
-                        return true; // dentro do limite, pode parar
+                        return true;
                     }
-                    // se for a última tentativa, aceita mesmo passando do limite (melhor esforço)
                     if (i == tentativasFps.length - 1) {
                         return true;
                     }
@@ -138,12 +127,12 @@ public class ConversorFigurinhaServer {
                         "ffmpeg",
                         "-y",
                         "-i", entrada.toAbsolutePath().toString(),
-                        "-t", String.valueOf(DURACAO_MAXIMA_SEGUNDOS), // corta no limite de duração
-                        "-an", // remove áudio (figurinha não tem som)
+                        "-t", String.valueOf(DURACAO_MAXIMA_SEGUNDOS),
+                        "-an",
                         "-vf", "fps=" + fps + ",scale=512:512:force_original_aspect_ratio=decrease,format=rgba,pad=512:512:(ow-iw)/2:(oh-ih)/2:color=0x00000000",
                         "-pix_fmt", "yuva420p",
                         "-vcodec", "libwebp",
-                        "-loop", "0", // repete infinitamente
+                        "-loop", "0",
                         "-q:v", String.valueOf(qualidade),
                         "-vsync", "0",
                         saida.toAbsolutePath().toString()
@@ -161,7 +150,6 @@ public class ConversorFigurinhaServer {
 
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(processo.getInputStream()))) {
                 while (reader.readLine() != null) {
-                    // Descarta o log do ffmpeg; se quiser debugar, printa aqui
                 }
             }
 
