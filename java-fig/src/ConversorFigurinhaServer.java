@@ -20,7 +20,7 @@ public class ConversorFigurinhaServer {
         server.setExecutor(null);
         server.start();
 
-        System.out.println("✅ Servidor Java rodando em http://localhost:8080");
+        System.out.println("Servidor Java rodando em http://localhost:8080");
         System.out.println("Endpoint disponível: POST /converter");
     }
 

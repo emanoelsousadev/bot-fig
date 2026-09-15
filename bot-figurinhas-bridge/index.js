@@ -33,7 +33,7 @@ async function iniciarBot() {
                 iniciarBot();
             }
         } else if (connection === 'open') {
-            console.log('✅ Conectado ao WhatsApp com sucesso!');
+            console.log('Conectado ao WhatsApp com sucesso!');
         }
     });
 
@@ -68,12 +68,12 @@ async function iniciarBot() {
                 const caminhoCompleto = path.join(PASTA_IMAGENS, nomeArquivo);
                 fs.writeFileSync(caminhoCompleto, buffer);
 
-                console.log(`✅ Arquivo salvo em: ${caminhoCompleto}`);
+                console.log(`Arquivo salvo em: ${caminhoCompleto}`);
 
-                console.log('🔄 Enviando para o backend Java converter em figurinha...');
+                console.log('Enviando para o backend Java converter em figurinha...');
                 const base64Original = buffer.toString('base64');
 
-                const resposta = await fetch(`http://localhost:8080/converter?tipo=${tipo}`, {
+                const resposta = await fetch(`http:
                     method: 'POST',
                     headers: { 'Content-Type': 'text/plain' },
                     body: base64Original
@@ -87,12 +87,12 @@ async function iniciarBot() {
                 const base64Webp = await resposta.text();
                 const bufferSticker = Buffer.from(base64Webp, 'base64');
 
-                console.log('📤 Enviando figurinha de volta...');
+                console.log('Enviando figurinha de volta...');
                 await sock.sendMessage(remetente, { sticker: bufferSticker });
 
-                console.log('✅ Figurinha enviada com sucesso!');
+                console.log('Figurinha enviada com sucesso!');
             } catch (erro) {
-                console.error(`❌ Erro ao processar o ${tipo}:`, erro);
+                console.error(`Erro ao processar o ${tipo}:`, erro);
             }
         }
     });
