@@ -73,7 +73,7 @@ async function iniciarBot() {
                 console.log('Enviando para o backend Java converter em figurinha...');
                 const base64Original = buffer.toString('base64');
 
-                const resposta = await fetch(`http:
+                const resposta = await fetch(`http://localhost:8080/converter?tipo=${tipo}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'text/plain' },
                     body: base64Original
